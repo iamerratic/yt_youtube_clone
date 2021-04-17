@@ -8,7 +8,6 @@ function SearchPage() {
 
     var location = useLocation();
     var queryObj = queryString.parse(location.search);
-    console.log(queryObj);
     return (
         <HeaderComponent />
     )

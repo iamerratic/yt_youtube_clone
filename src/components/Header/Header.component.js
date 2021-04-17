@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search'
 import MicIcon from '@material-ui/icons/Mic';
@@ -7,14 +8,50 @@ import VideoCallIcon from '@material-ui/icons/VideoCall';
 import AppsIcon from '@material-ui/icons/Apps';
 import NotificationIcon from '@material-ui/icons/Notifications';
 import Avatar from '@material-ui/core/Avatar';
+import PersonIcon from '@material-ui/icons/Person';
 
 import './Header.css';
 
 import { signInWithGoogle } from '../../config/firebase.config';
+import { signIn, logout } from '../../store/actions/user.action';
+import { auth as fireAuth } from '../../config/firebase.config';
 
-function HeaderComponent() {
+function HeaderComponent({ auth, signIn, logout }) {
+
 
     var [val, setVal] = useState('');
+
+
+    function handleClick() {
+
+        if (!auth.user) {
+            return signInWithGoogle().then(data => {
+                const { email, name } = data.additionalUserInfo.profile;
+                const { idToken } = data.credential;
+                signIn({
+                    user: {
+                        email,
+                        name,
+                        idToken
+                    }
+                });
+            });
+        }
+
+        fireAuth.signOut().then(logout);
+
+    }
+
+    function renderAvatar() {
+
+        var child = !auth.user ? <PersonIcon /> : auth.user.name[0];
+
+        return (
+            <Avatar className="header__actions_avatar" onClick={handleClick}>
+                {child}
+            </Avatar>
+        );
+    }
 
     return (
         <div className="header">
@@ -43,13 +80,30 @@ function HeaderComponent() {
                 <VideoCallIcon />
                 <AppsIcon />
                 <NotificationIcon />
-                <Avatar className="header__actions_avatar" onClick={() => {
-                    signInWithGoogle().then(console.log);
-                }}>K</Avatar>
+                {renderAvatar()}
             </div>
         </div>
     );
 }
 
+var mapStateToProps = (state) => {
 
-export default HeaderComponent;
+    var auth = state.auth;
+
+    return {
+        auth: auth
+    };
+};
+
+
+var mapDispatchToProps = (dispatch) => {
+
+    return {
+        signIn: (user) => dispatch(signIn(user)),
+        logout: () => dispatch(logout())
+    };
+}
+
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(HeaderComponent);
