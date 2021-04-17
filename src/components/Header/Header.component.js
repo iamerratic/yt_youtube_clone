@@ -10,6 +10,8 @@ import Avatar from '@material-ui/core/Avatar';
 
 import './Header.css';
 
+import { signInWithGoogle } from '../../config/firebase.config';
+
 function HeaderComponent() {
 
     var [val, setVal] = useState('');
@@ -41,7 +43,9 @@ function HeaderComponent() {
                 <VideoCallIcon />
                 <AppsIcon />
                 <NotificationIcon />
-                <Avatar>K</Avatar>
+                <Avatar className="header__actions_avatar" onClick={() => {
+                    signInWithGoogle().then(console.log);
+                }}>K</Avatar>
             </div>
         </div>
     );

@@ -41,3 +41,7 @@
 .header__actions > svg {
   padding: 0px 15px;
 }
+
+.header__actions_avatar {
+  cursor: pointer;
+}
